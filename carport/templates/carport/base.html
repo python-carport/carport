@@ -1,0 +1,24 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}base{% endblock %}</title>
+    <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet">
+<style type="text/css">
+		@font-face {
+			font-family: 'Glyphicons Halflings';
+			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot'%}");
+			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot?#iefix'%}") format('embedded-opentype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.woff'%}") format('woff'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.ttf'%}") format('truetype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.svg'%}") format('svg');
+		}
+</style>
+    {% block css %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+</body>
+</html>
