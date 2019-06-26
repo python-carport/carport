@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}base{% endblock %}</title>
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
 <style type="text/css">
 		@font-face {
 			font-family: 'Glyphicons Halflings';
@@ -16,9 +17,54 @@
     {% block css %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
+    {% if request.session.is_login %}
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">共享车位</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li id = 'appointment'><a href="appointment">预约</a></li>
+            <li id = 'order'><a href="order">我的订单</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    Java
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">jmeter</a></li>
+                    <li><a href="#">EJB</a></li>
+                    <li><a href="#">Jasper Report</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">分离的链接</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">另一个分离的链接</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    </div>
+</nav>
+    {% endif %}
+    {% block content %}
+
+    {% endblock %}
 
     <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+    <script src="{% static 'js/moment-with-locales.min.js' %}"></script>
     <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js' %}"></script>
+
+    <script>
+        {% if request.session.is_login %}
+            $("#{{ request.session.current_page }}").addClass("active");
+            {% if request.session.previous_page != '' %}
+                $("#{{ request.session.previous_page }}").removeClass("active");
+            {% endif %}
+        {% endif %}
+    </script>
+    {% block js %}
+    {% endblock %}
 </body>
 </html>

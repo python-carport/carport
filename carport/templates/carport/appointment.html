@@ -1,0 +1,113 @@
+{% extends 'carport/base.html' %}
+{% load staticfiles %}
+{% block title %}预约{% endblock %}
+{% block css %}
+{#    <link rel="stylesheet" href="{% static 'css/login.css' %}">#}
+{% endblock %}
+
+
+{% block content %}
+    {{ request.session.user_name }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10" style="height: 80px">
+                {% if appointment_message != "" %}
+                    <div id="hint">
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                                &times;
+                            </button>
+                            {{ appointment_message }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-5">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">车位预约</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div style="padding: 20px 50px 10px;">
+                            <form class="bs-example bs-example-form" role="form" action="inquiry" method="GET">
+                                <div class="input-group">
+                                    <span class="input-group-addon">汽车车牌</span>
+                                        {{ appointment_form.car_license }}
+                                </div>
+                                <br>
+                                <div class='input-group date' id='datetimepicker1'>
+                                    <span class="input-group-addon">开始时间</span>
+                                        {{ appointment_form.begin_time }}
+    {#                                    <input type='text' class="form-control" />#}
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <br>
+                                <div class='input-group date' id='datetimepicker2'>
+                                    <span class="input-group-addon">结束时间</span>
+    {#                                   <input type='text' class="form-control" />#}
+                                        {{ appointment_form.end_time }}
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <br><br>
+                                <div>
+                                    <label>金额：{{ appointment_form.total }}</label>
+                                    <button style="margin-left: 200px;" type="submit" class="btn btn-info">查 询</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-offset-1 col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">可选车位</h3>
+                    </div>
+                    <div class="panel-body">
+                        这是一个基本的面板
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">可协商车位</h3>
+                    </div>
+                    <div class="panel-body">
+                        这是一个基本的面板
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+    {% block js %}
+        <script>
+            var now = new Date()
+            $('#datetimepicker1').datetimepicker({
+                locale : moment().locale('zh-cn'),
+                format : 'YYYY-MM-DD HH:mm',
+                minDate: new Date(),
+                sideBySide: true,
+            });
+            $('#datetimepicker2').datetimepicker({
+                format : 'YYYY-MM-DD HH:mm',
+                locale : moment().locale('zh-cn'),
+                minDate: new Date(),
+                useCurrent: false,
+                sideBySide: true,
+            });
+            $("#datetimepicker1").on("dp.change", function (e) {
+                $('#datetimepicker2').data("DateTimePicker").minDate(e.date);
+            });
+            $("#datetimepicker2").on("dp.change", function (e) {
+                $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+            });
+        </script>
+    {% endblock %}
