@@ -27,21 +27,17 @@
         <ul class="nav navbar-nav">
             <li id = 'appointment'><a href="appointment">预约</a></li>
             <li id = 'order'><a href="order">我的订单</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    Java
-                    <b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">jmeter</a></li>
-                    <li><a href="#">EJB</a></li>
-                    <li><a href="#">Jasper Report</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">分离的链接</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">另一个分离的链接</a></li>
-                </ul>
-            </li>
+
+            <div id = 'user_tools'>
+                <div id = 'row1'>
+                    欢迎，<strong>{{ user.name }}</strong>
+                </div>
+                <br>
+                <div id = 'row2'>
+                    余额：<strong>{{ user.remain }}</strong>
+                    信用值：<strong>{{ user.credit }}</strong>
+                </div>
+            </div>
         </ul>
     </div>
     </div>

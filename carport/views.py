@@ -89,8 +89,15 @@ def order(request):
 
 
 def finish(request):
-	print(request.GET)
-	return HttpResponse("Hello, world. You're at the polls index.")
+	order_id = request.GET.get('order_id')
+	this_order = models.Order.objects.get(id = order_id)
+	this_order.status = "warning"
+	this_order.save()
+
+	order_message = "x"
+	user_id = request.session['user_id']
+	order_list = models.Order.objects.filter(carport_customer_id = user_id)
+	return render(request, 'carport/order.html', locals())
 
 
 def date_diff(begin_time, end_time):

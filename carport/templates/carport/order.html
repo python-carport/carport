@@ -56,7 +56,8 @@
                                     <td>{{ order|displayName:'status' }}</td>
                                     {% if order.status == 'success' %}
                                         <td>
-                                             <button onclick="finish({{ order.id }})" type="button" class="btn btn-default">终止</button>
+                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-warning">终止</button>
+                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-danger">取消</button>
                                         </td>
                                     {% endif %}
                                 </tr>
@@ -74,7 +75,10 @@
     <script>
         function finish(order_id) {
             console.log(order_id);
-            $.get('finish',{order_id:order_id})
+            $.get('finish',{order_id:order_id},function (data) {
+                console.log(data);
+                location.reload()
+            })
         }
     </script>
 {% endblock %}
