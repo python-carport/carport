@@ -1,7 +1,9 @@
 import math
+
 from django.shortcuts import render , redirect
 
 from django.http import HttpResponse
+from django.template.defaultfilters import register
 
 from carport import models
 from carport.models import LoginForm , AppointmentForm
@@ -76,11 +78,26 @@ def inquiry(request):
 	return render(request, 'carport/appointment.html', locals())
 
 
+def order(request):
+	order_message = "x"
+	user_id = request.session['user_id']
+	order_list = models.Order.objects.filter(carport_customer_id = user_id)
+
+	request.session['previous_page'] = request.session['current_page']
+	request.session['current_page'] = 'order'
+	return render(request, 'carport/order.html', locals())
+
+
+def finish(request):
+	print(request.GET)
+	return HttpResponse("Hello, world. You're at the polls index.")
+
+
 def date_diff(begin_time, end_time):
 	diff = end_time - begin_time
 	diff_str = str(diff)
 	if diff_str.find(' days, ') > 0:
-		d = int(diff_str.split(' days, '|' day, ')[0])
+		d = int(diff_str.split(' days, ')[0])
 		h = diff.seconds/60/60
 		return d*24+h
 	elif diff_str.find(' day, ') > 0:
@@ -92,7 +109,7 @@ def date_diff(begin_time, end_time):
 
 
 def get_price(time):
-	table = {1:2, 5:5, 24:10}
+	table = {1: 2, 5: 5, 24: 10}
 	over_day = (int(time / 24)) * 10
 	inner_day = 0
 	for i in table:
@@ -100,3 +117,9 @@ def get_price(time):
 			inner_day = table[i]
 			break
 	return over_day + inner_day
+
+
+@register.filter(name='displayName')
+def displayName(value, arg):
+	return eval('value.get_'+arg+'_display()')#eval字符串方法了解一下
+

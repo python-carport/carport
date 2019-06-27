@@ -47,6 +47,13 @@ class Record(models.Model):
 
 
 class Order(models.Model):
+	status_list = (
+		# ('1', '未开始'),
+		('success', '进行中'),
+		('warning', '已结束'),
+		('active', '已撤销'),
+		('danger', '超时'),
+	)
 	id = models.IntegerField(primary_key = True, db_column = 'Fld')
 	carport_owner = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
 	carport_customer = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
@@ -56,9 +63,10 @@ class Order(models.Model):
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 	amount = models.DecimalField(max_digits = 10, decimal_places = 2)
+	status = models.CharField(max_length = 10, choices = status_list, default = 1)
 
 	def __str__(self):
-		return '%s 与 %s -- %s' % (self.customer.name, self.owner.name, self.create_time)
+		return '%s 与 %s -- %s' % (self.carport_customer.name, self.carport_owner.name, self.create_time)
 
 
 class LoginForm(forms.Form):
