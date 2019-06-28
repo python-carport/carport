@@ -8,5 +8,7 @@ urlpatterns = [
     path('appointment', views.appointment, name = 'appointment'),
     path('inquiry', views.inquiry, name = 'inquiry'),
     path('order', views.order, name = 'order'),
-    path('finish', views.finish, name = 'finish')
+    path('finish', views.finish, name = 'finish'),
+    path('cancel', views.cancel, name = 'cancel'),
+
 ]

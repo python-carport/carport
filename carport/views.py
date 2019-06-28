@@ -1,5 +1,8 @@
+import datetime
 import math
+from _decimal import Decimal
 
+import decimal
 from django.shortcuts import render , redirect
 
 from django.http import HttpResponse
@@ -81,7 +84,7 @@ def inquiry(request):
 def order(request):
 	order_message = "x"
 	user_id = request.session['user_id']
-	order_list = models.Order.objects.filter(carport_customer_id = user_id)
+	order_list = models.Order.objects.filter(carport_owner_id = user_id)
 
 	request.session['previous_page'] = request.session['current_page']
 	request.session['current_page'] = 'order'
@@ -98,6 +101,37 @@ def finish(request):
 	user_id = request.session['user_id']
 	order_list = models.Order.objects.filter(carport_customer_id = user_id)
 	return render(request, 'carport/order.html', locals())
+
+
+def cancel (request):
+	order_id = request.GET.get ('order_id')
+	order = models.Order.objects.get (id=order_id)
+	begin_time = order.begin_time
+	now = datetime.datetime.now()
+	diff = date_diff (now, begin_time)
+	user_id = request.session['user_id']
+	carport_customer = order.carport_customer
+	carport_owner = order.carport_owner
+	if diff>1:
+		order.status='active'
+		order.save()
+	elif diff<=1:
+		if order.carport_owner.id == user_id:
+			print(1)
+			carport_owner.credit -= decimal.Decimal(0.50)
+			carport_owner.remain -= decimal.Decimal(order.amount*2)
+			carport_customer.remain += decimal.Decimal(order.amount*2)
+			order.status = 'active'
+			order.save()
+			carport_owner.save()
+			carport_customer.save()
+		elif order.carport_customer.id == user_id:
+			print(2)
+			order.status = 'active'
+			order.save()
+			carport_customer.credit -= decimal.Decimal(0.50)
+			carport_customer.save()
+	return render(request , 'carport/order.html' , locals())
 
 
 def date_diff(begin_time, end_time):
@@ -124,6 +158,24 @@ def get_price(time):
 			inner_day = table[i]
 			break
 	return over_day + inner_day
+
+
+def check():
+	order_list = models.Order.objects.filter(status='success')
+	for order in order_list :
+		end_time = order.end_time
+		present_time = datetime.datetime.now()
+		carport_customer = order.carport_customer
+		if present_time > end_time:
+			carport_customer.credit -= decimal.Decimal(1)
+			order.status = 'danger'
+			carport_customer.save()
+			order.save()
+			print(order)
+			print(carport_customer)
+
+
+	return 1
 
 
 @register.filter(name='displayName')

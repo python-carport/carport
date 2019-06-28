@@ -38,7 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'carport.apps.CarportConfig',
+    'django_crontab',
 ]
+
+
+CRONJOBS = [
+    ('*/1 * * * *', 'carport.views.check', '>>/tmp/test.log')
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
