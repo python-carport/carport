@@ -8,27 +8,34 @@ class User(models.Model):
 	# 	('female', '女'),
 	# )
 
-	id = models.IntegerField(primary_key = True, db_column = 'Fld')
+	# id = models.IntegerField(primary_key = True, db_column = 'Fld')
 	name = models.CharField(max_length = 200)
-	# sex = models.CharField(max_length = 32, choices = gender, default = '男')
-	phone = models.CharField(max_length = 200)
-	# email = models.EmailField(unique = True, default = "")
+	phone = models.CharField(primary_key = True, max_length = 200)
 	password = models.CharField(max_length = 200)
 	remain = models.DecimalField(max_digits = 10, decimal_places = 2, default = 0.00)
 	credit = models.DecimalField(max_digits = 10, decimal_places = 2, default = 5.0)
 
 	def __str__(self):
-		return '%s , %s' % (self.id, self.name)
+		return '%s , %s' % (self.name, self.phone)
 
 
 class Carport(models.Model):
-	id = models.IntegerField(primary_key = True, db_column = 'Fld')
-	site = models.CharField(max_length = 200, default = "")
-	owner = models.ForeignKey(User, on_delete = models.CASCADE)
-	using = models.CharField(max_length = 10)
+	site = models.CharField(primary_key = True, max_length = 200)
+	current_car_license = models.CharField(max_length = 200, default = '')
+	owner_phone = models.CharField(max_length = 200)
 
 	def __str__(self):
-		return '%s 属于 %s' % (self.locate, self.user.name)
+		if self.current_car_license != '':
+			return '车位 %s ，%s 正在使用' % (self.site, self.current_car_license)
+		return '车位 %s ，空闲' % self.site
+
+
+#车位与车位主人所拥有的车辆的关系，用于车位推荐算法
+class Link(models.Model):
+	id = models.IntegerField(primary_key = True, db_column = 'Fld')
+	carport_site = models.CharField(max_length = 200)
+	car_license = models.CharField(max_length = 200)
+	owner_phone = models.CharField(max_length = 200)
 
 
 class Record(models.Model):
@@ -57,7 +64,7 @@ class Order(models.Model):
 	carport_owner = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
 	carport_customer = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
 	car_license = models.CharField(max_length = 200)
-	carport = models.CharField(max_length = 200)
+	carport_site = models.CharField(max_length = 200)
 	create_time = models.DateTimeField()
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
@@ -66,6 +73,23 @@ class Order(models.Model):
 
 	def __str__(self):
 		return '%s 与 %s -- %s' % (self.carport_customer.name, self.carport_owner.name, self.create_time)
+
+
+#协商列表
+class Negotiation(models.Model):
+	id = models.IntegerField(primary_key = True , db_column = 'Fld')
+	customer_phone = models.CharField(max_length = 200)
+	owner_phone = models.CharField(max_length = 200)
+	request_site = models.CharField(max_length = 200)
+	request_list = models.CharField(max_length = 1000)
+	create_time = models.DateTimeField()
+
+
+class AvailCarport(models.Model):
+	carport_site = models.CharField(primary_key = True,max_length = 200)
+	begin_time = models.DateTimeField()
+	end_time = models.DateTimeField()
+	owner_phone = models.CharField(max_length = 200)
 
 
 class LoginForm(forms.Form):
@@ -80,6 +104,7 @@ class AppointmentForm(forms.Form):
 	car_license = forms.CharField(max_length = 200, widget = forms.TextInput(
 		attrs = {'class': 'form-control'}))
 	begin_time = forms.DateTimeField(widget = forms.TextInput(
-		attrs = {'class': 'form-control', 'id': 'x'}))
+		attrs = {'class': 'form-control'}))
 	end_time = forms.DateTimeField(widget = forms.TextInput(
 		attrs = {'class': 'form-control'}))
+

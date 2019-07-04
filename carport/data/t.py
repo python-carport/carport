@@ -1,4 +1,5 @@
 import datetime
-
-print('s11s11a'.split('11'))
-print(datetime.datetime.now())
+import time
+a = datetime.datetime.strptime('13:15:20','%H:%M:%S')
+b = datetime.datetime.strptime('21:02:36','%H:%M:%S')
+print(b-a)

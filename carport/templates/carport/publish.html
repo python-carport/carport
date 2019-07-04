@@ -1,0 +1,106 @@
+{% extends 'carport/base.html' %}
+{% load staticfiles %}
+{% block title %}预约{% endblock %}
+{% block css %}
+{#    <link rel="stylesheet" href="{% static 'css/login.css' %}">#}
+{% endblock %}
+
+
+{% block content %}
+    {% for field in publish_form %}
+
+
+
+            {{ field.errors }}
+            {{ field.label_tag }}: {{ field }}
+
+
+    {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10" style="height: 80px">
+                {% if publish_message != "" %}
+                    <div id="hint">
+                        <div class="alert {{ alert_class }} alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                                &times;
+                            </button>
+                            {{ publish_message }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if result_list_size != 0 %}
+        <div class="row">
+            <div class="col-md-offset-3 col-md-6">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">空闲车位发布</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div style="padding: 20px 50px 10px;">
+                            <form class="bs-example bs-example-form" role="form" action="publish" method="POST">
+{#                                {% csrf_token %}#}
+                                <div class="input-group">
+                                    <span class="input-group-addon">车位序号：</span>
+                                    <select class="form-control" name="carport_site">
+                                        {% for i in result_list %}
+                                            <option>{{ i }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <br>
+                                <div class='input-group date' id='datetimepicker1'>
+                                    <span class="input-group-addon">开始时间</span>
+                                        <input class="form-control" type="text" name="begin_time">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <br>
+                                <div class='input-group date' id='datetimepicker2'>
+                                    <span class="input-group-addon">结束时间</span>
+                                        <input class="form-control" type="text" name="end_time">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <br><br>
+                                <button style="margin-left: 270px;" type="submit" class="btn btn-info">发 布</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+    {% block js %}
+        <script>
+            var now = new Date()
+            $('#datetimepicker1').datetimepicker({
+                locale : moment().locale('zh-cn'),
+                format : 'YYYY-MM-DD HH:mm',
+                minDate: new Date(),
+                sideBySide: true,
+            });
+            $('#datetimepicker2').datetimepicker({
+                format : 'YYYY-MM-DD HH:mm',
+                locale : moment().locale('zh-cn'),
+                minDate: new Date(),
+                useCurrent: false,
+                sideBySide: true,
+            });
+            $("#datetimepicker1").on("dp.change", function (e) {
+                $('#datetimepicker2').data("DateTimePicker").minDate(e.date);
+            });
+            $("#datetimepicker2").on("dp.change", function (e) {
+                $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+            });
+        </script>
+    {% endblock %}

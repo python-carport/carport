@@ -12,7 +12,7 @@
             <div class="col-md-offset-1 col-md-10" style="height: 80px">
                 {% if appointment_message != "" %}
                     <div id="hint">
-                        <div class="alert alert-danger alert-dismissable">
+                        <div class="alert {{ alert_class }} alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
                                 &times;
                             </button>
@@ -68,15 +68,31 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">可选车位</h3>
                     </div>
-                    <div class="panel-body">
-                        这是一个基本的面板
+                    <div class="panel-body scrollbar" style="height: 150px;overflow-y:scroll">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>车位号</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in carport_list %}
+                                <tr>
+                                <td>{{ i.carport_site }}</td>
+                                <td><button class="btn btn-primary" onclick="appointment({{ i.carport_site }})">预 约</button></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <button class="btn btn-warning">系统协商车位</button>
                     </div>
                 </div>
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h3 class="panel-title">可协商车位</h3>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body scrollbar" style="height: 200px;overflow-y:scroll">
                         这是一个基本的面板
                     </div>
                 </div>
@@ -108,5 +124,15 @@
             $("#datetimepicker2").on("dp.change", function (e) {
                 $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
             });
+
+            function appointment(carport_site) {
+                $.post('appointment', {carport_site: carport_site}, function (data) {
+                    console.log(window)
+                    console.log(data)
+
+{#                    console.log()#}
+{#                    location.reload()#}
+                })
+            }
         </script>
     {% endblock %}

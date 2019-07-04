@@ -7,13 +7,14 @@
     <title>{% block title %}base{% endblock %}</title>
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
-<style type="text/css">
-		@font-face {
-			font-family: 'Glyphicons Halflings';
-			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot'%}");
-			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot?#iefix'%}") format('embedded-opentype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.woff'%}") format('woff'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.ttf'%}") format('truetype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.svg'%}") format('svg');
-		}
-</style>
+    <link href="{% static 'css/scrollbar.css' %}" rel="stylesheet">
+{#<style type="text/css">#}
+{#		@font-face {#}
+{#			font-family: 'Glyphicons Halflings';#}
+{#			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot'%}");#}
+{#			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot?#iefix'%}") format('embedded-opentype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.woff'%}") format('woff'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.ttf'%}") format('truetype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.svg'%}") format('svg');#}
+{#		}#}
+{#</style>#}
     {% block css %}{% endblock %}
 </head>
 <body>
@@ -25,17 +26,18 @@
     </div>
     <div>
         <ul class="nav navbar-nav">
-            <li id = 'appointment'><a href="appointment">预约</a></li>
+            <li id = 'appointment'><a href="appointment">预约车位</a></li>
+            <li id = 'publish'><a href="publish">发布车位</a></li>
             <li id = 'order'><a href="order">我的订单</a></li>
 
-            <div id = 'user_tools'>
-                <div id = 'row1'>
-                    欢迎，<strong>{{ user.name }}</strong>
+            <div id = 'user_tools' class="pull-right" style="position:absolute;margin-left: 70%">
+                <div id = 'row1' class="row">
+                    欢迎，<strong>{{ request.session.user.phone }}</strong>
+                    <button style="float:right" class="btn-sm btn-danger" onclick="logout()">注销</button>
                 </div>
-                <br>
-                <div id = 'row2'>
-                    余额：<strong>{{ user.remain }}</strong>
-                    信用值：<strong>{{ user.credit }}</strong>
+                <div id = 'row2' class="row">
+                    余额：<strong>{{ request.session.user.remain }}</strong>&nbsp;&nbsp;&nbsp;
+                    信用值：<strong>{{ request.session.user.credit }}</strong>
                 </div>
             </div>
         </ul>
@@ -53,12 +55,18 @@
     <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js' %}"></script>
 
     <script>
-        {% if request.session.is_login %}
+        {% if request.session.is_login and request.session.current_page != request.session.previous_page %}
             $("#{{ request.session.current_page }}").addClass("active");
             {% if request.session.previous_page != '' %}
                 $("#{{ request.session.previous_page }}").removeClass("active");
             {% endif %}
         {% endif %}
+
+        function logout() {
+            $.get("logout",{},function () {
+                location.href='login'
+            })
+        }
     </script>
     {% block js %}
     {% endblock %}
