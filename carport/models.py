@@ -23,6 +23,7 @@ class Carport(models.Model):
 	site = models.CharField(primary_key = True, max_length = 200)
 	current_car_license = models.CharField(max_length = 200, default = '')
 	owner_phone = models.CharField(max_length = 200)
+	owner_phonex = models.CharField(max_length = 200)
 
 	def __str__(self):
 		if self.current_car_license != '':
