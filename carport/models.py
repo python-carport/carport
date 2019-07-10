@@ -44,9 +44,11 @@ class Record(models.Model):
 	type = models.CharField(max_length = 200)
 	local = models.CharField(max_length = 200)
 	account = models.DecimalField(max_digits = 10, decimal_places = 2)
-	total_time = models.CharField(max_length = 200)
+	total_time = models.DecimalField(max_digits = 10, decimal_places = 2)
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
+
+	carport_site = models.CharField(max_length = 10)
 
 	def __str__(self):
 		return '%s , %s' % (self.id, self.car_license)
@@ -80,9 +82,10 @@ class Negotiation(models.Model):
 	id = models.IntegerField(primary_key = True , db_column = 'Fld')
 	customer_phone = models.CharField(max_length = 200)
 	owner_phone = models.CharField(max_length = 200)
-	request_site = models.CharField(max_length = 200)
-	request_list = models.CharField(max_length = 1000)
-	create_time = models.DateTimeField()
+	negotiate_site = models.CharField(max_length = 200)
+	negotiate_list = models.CharField(max_length = 1000)
+	record_time = models.DateTimeField()
+	status = models.CharField(max_length = 20, default = 'underway')
 
 
 class AvailCarport(models.Model):

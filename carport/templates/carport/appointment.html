@@ -11,12 +11,12 @@
         <div class="row">
             <div class="col-md-offset-1 col-md-10" style="height: 80px">
                 {% if appointment_message != "" %}
-                    <div id="hint">
+                    <div >
                         <div class="alert {{ alert_class }} alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
                                 &times;
                             </button>
-                            {{ appointment_message }}
+                            <div id="hint">{{ request.session.appointment_message }}</div>
                         </div>
                     </div>
                 {% endif %}
@@ -85,15 +85,32 @@
                             {% endfor %}
                             </tbody>
                         </table>
-                        <button class="btn btn-warning">系统协商车位</button>
                     </div>
                 </div>
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">可协商车位</h3>
+                        <h3 class="panel-title">系统推荐的可协商车位</h3>
                     </div>
                     <div class="panel-body scrollbar" style="height: 200px;overflow-y:scroll">
-                        这是一个基本的面板
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>车位号</th>
+                                <th>车位主人手机号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in negotiate_list %}
+                                <tr>
+                                <td>{{ i.0 }}</td>
+                                <td>{{ i.1 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if negotiate_list %}
+                            <button class="btn btn-warning" onclick="negotiate()">协商车位</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -132,6 +149,13 @@
 
 {#                    console.log()#}
 {#                    location.reload()#}
+                })
+            }
+
+            function negotiate() {
+                $.post('negotiate',{},function (data) {
+{#                    console.log(data)#}
+                    $('#hint').html("系统协商中")
                 })
             }
         </script>

@@ -67,4 +67,17 @@ for i in range (2, rows):
     print(str(id)+"  "+name)
     id = id+1
 
-
+models.User.objects.create(
+            name = 'x',
+            phone = '1',
+            password= '1',
+            remain= 30.0,
+            credit = 5.0,
+        )
+models.User.objects.create(
+            name = 'x',
+            phone = '2',
+            password= '2',
+            remain= 30.0,
+            credit = 5.0,
+        )

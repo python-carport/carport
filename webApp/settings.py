@@ -43,7 +43,8 @@ INSTALLED_APPS = [
 
 
 CRONJOBS = [
-    ('*/1 * * * *', 'carport.views.check', '>>/tmp/test.log')
+    ('*/1 * * * *', 'carport.views.check', '>>/tmp/test.log'),
+    ('*/1 * * * *', 'carport.views.auto_negotiate', '>>/tmp/test.log'),
 ]
 
 

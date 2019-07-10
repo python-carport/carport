@@ -1,6 +1,6 @@
 {% extends 'carport/base.html' %}
 {% load staticfiles %}
-{% block title %}预约{% endblock %}
+{% block title %}我接受的订单{% endblock %}
 {% block css %}
 {#    <link rel="stylesheet" href="{% static 'css/login.css' %}">#}
 {% endblock %}
@@ -24,7 +24,7 @@
         </div>
         <div class="row">
             <div class="col-md-offset-0 col-md-12">
-                <div class="panel panel-success">
+                <div class="panel panel-success scrollbar" style="height: 300px;overflow-y:scroll">
                     <div class="panel-heading">
                         <h3 class="panel-title">车位预约</h3>
                     </div>
@@ -56,7 +56,6 @@
                                     <td>{{ order|displayName:'status' }}</td>
                                     {% if order.status == 'success' %}
                                         <td>
-                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-warning">终止</button>
                                             <button onclick="cancel({{ order.id }})" type="button" class="btn btn-danger">取消</button>
                                         </td>
                                     {% endif %}
@@ -73,12 +72,6 @@
 
 {% block js %}
     <script>
-        function finish(order_id) {
-            $.get('finish',{order_id:order_id},function (data) {
-                console.log(data);
-                location.reload()
-            })
-        }
         function cancel(order_id){
             $.get ('cancel', {order_id:order_id},function (){
                 location.reload()

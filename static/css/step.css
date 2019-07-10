@@ -1,0 +1,73 @@
+.step {
+    position: relative;
+    vertical-align: top;
+    display: inline-block;
+    margin-top: 18px;
+}
+
+.step-head {
+    width: 80px;
+    height: 20px;
+    line-height: 19px;
+    text-align: center;
+    vertical-align: top;
+    color: #bfcbd9;
+    font-size: 14px;
+    z-index: 10000;
+    margin-left: 15px;
+}
+.step-icon{
+    border-radius: 50%;
+    border: 2px solid #bfcbd9;
+    width: 22px;
+}
+.step-main {
+    font-size: 12px;
+    color: #48576a;
+}
+
+.step-line {
+    position: absolute;
+    top: 9px;
+    height: 5px;
+    left: 37px;
+    right: -18px;
+    display: inline-block;
+    background-color: #bfcbd9;
+    z-index: 10000;
+}
+
+.step-circle {
+    margin: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #bfcbd9;
+}
+
+    .is-success > .step-head > .step-icon {
+        color: #e15e43;
+        border-color: #e15e43;
+    }
+
+    .is-success > .step-head .step-circle {
+        background-color: #2f318e;
+    }
+
+    .is-success > .step-head > .step-line {
+        background-color: #6c8fdf;
+    }
+
+
+    .last-success > .step-head > .step-icon {
+        color: #e15e43;
+        border-color: #e15e43;
+    }
+
+    .last-success > .step-head .step-circle {
+        background-color: #2f318e;
+    }
+
+    .last-success > .step-head > .step-line {
+        background-color: #6c8fdf;
+    }

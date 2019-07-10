@@ -1,3 +1,6 @@
+import decimal
+import random
+
 import xlrd
 import os,django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "webApp.settings")# project_name 项目名称
@@ -39,7 +42,7 @@ for i in range(2, rows):
 	type = trim(sheet.cell(i, 3).value)
 	local = trim(sheet.cell(i, 5).value)
 	account = trim(sheet.cell(i, 7).value)
-	total_time = sheet.cell(i, 8).value
+	total_time = trim(sheet.cell(i, 8).value)
 	begin_time = sheet.cell(i, 9).value
 	end_time = sheet.cell(i, 12).value
 
@@ -56,9 +59,10 @@ for i in range(2, rows):
 		type = type,
 		local = local,
 		account = account,
-		total_time = total_time,
+		total_time = decimal.Decimal(str(total_time).split('小时')[0])+(decimal.Decimal(str(total_time).split('小时')[1].split('分')[0])/60),
 		begin_time = begin_time,
 		end_time = end_time,
+		carport_site = str(random.randint(1, 130)),
 	)
 	# print(id)
 print(a)

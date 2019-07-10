@@ -1,21 +1,12 @@
 {% extends 'carport/base.html' %}
 {% load staticfiles %}
-{% block title %}预约{% endblock %}
+{% block title %}车位发布{% endblock %}
 {% block css %}
 {#    <link rel="stylesheet" href="{% static 'css/login.css' %}">#}
 {% endblock %}
 
 
 {% block content %}
-    {% for field in publish_form %}
-
-
-
-            {{ field.errors }}
-            {{ field.label_tag }}: {{ field }}
-
-
-    {% endfor %}
     <div class="container">
         <div class="row">
             <div class="col-md-offset-1 col-md-10" style="height: 80px">

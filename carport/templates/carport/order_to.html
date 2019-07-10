@@ -1,0 +1,138 @@
+{% extends 'carport/base.html' %}
+{% load staticfiles %}
+{% block title %}我预约的订单{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/step.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10" style="height: 80px">
+                {% if order_message != "" %}
+                    <div id="hint">
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                                &times;
+                            </button>
+                            {{ order_message }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-0 col-md-12">
+                <div class="panel panel-success scrollbar" style="height: 300px;overflow-y:scroll">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">车位预约</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>订单号</th>
+                              <th>订单创建日期</th>
+                              <th>预约的车牌</th>
+                              <th>预约的车位</th>
+                              <th>开始时间</th>
+                              <th>结束时间</th>
+                              <th>订单金额</th>
+                              <th>订单状态</th>
+                              <th>操作</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for order in order_list %}
+                                <tr class="{{ order.status }}">
+                                    <td>{{ order.id }}</td>
+                                    <td>{{ order.create_time }}</td>
+                                    <td>{{ order.car_license }}</td>
+                                    <td>{{ order.carport }}</td>
+                                    <td>{{ order.begin_time }}</td>
+                                    <td>{{ order.end_time }}</td>
+                                    <td>{{ order.amount }}</td>
+                                    <td>{{ order|displayName:'status' }}</td>
+                                    {% if order.status == 'success' %}
+                                        <td>
+                                            <button onclick="cancel({{ order.id }})" type="button" class="btn btn-danger">取消</button>
+                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-warning">终止</button>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if step_index != -1 %}
+                    <div class="steps">
+                    <h3 style="float: left">协商进度：</h3>
+                    {% for i in negotiate_list %}
+                        <div class="step ">
+                            <div class="step-head">
+                                <div class="step-icon">
+                                    {{ i.2 }}
+                                </div>
+                                {% if i.2 != list_len %}
+
+                                    <div class="step-line"></div>
+                                {% endif %}
+                            </div>
+                            <div class="step-main">
+                                {{ i.0 }}号车位
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        function finish(order_id) {
+            $.get('finish',{order_id:order_id},function (data) {
+                console.log(data);
+                location.reload()
+            })
+        }
+        function cancel(order_id){
+            $.get ('cancel', {order_id:order_id},function (){
+                location.reload()
+            })
+        }
+
+        var steps = $(".step");
+        var stepIndex = {{ step_index }};
+
+        setStep(stepIndex);
+
+        $(".step-icon").click(function () {
+            var me = this;
+            stepIndex = $(me).parents(".step").index();
+            setStep(stepIndex);
+        });
+
+
+        function setStep(stepIndex) {
+            $(steps).removeClass("is-success");
+            $(steps).removeClass("last-success");
+
+            for (var i = 0; i <= stepIndex; i++) {
+                var step = steps[i];
+                if (i < stepIndex) {
+                    $(step).addClass("is-success");
+                }
+                else {
+                    $(step).addClass("last-success");
+                }
+            }
+        }
+    </script>
+{% endblock %}

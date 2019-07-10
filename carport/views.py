@@ -62,7 +62,8 @@ def appointment(request):
 	if not request.session.get('is_login'):
 		return redirect('/carport/login')
 	alert_class = ''
-	appointment_message = ""
+	request.session['appointment_message'] = ''
+	# appointment_message = ""
 	if request.method == 'POST':
 		carport_site = request.POST.get('carport_site')
 		car_license = request.session['appointment_car_license']
@@ -86,6 +87,7 @@ def appointment(request):
 		)
 		# models.AvailCarport.objects.get(carport_site = carport_site).delete()
 		appointment_message = '预订成功!'
+		request.session['appointment_message'] = '预订成功!'
 		alert_class = 'alert-success'
 		return render(request , 'carport/appointment.html' , locals())
 
@@ -139,9 +141,6 @@ def publish(request):
 	carport_site_list = models.Link.objects.filter(owner_phone = user_phone).values_list('carport_site', flat= True)
 	request.session['previous_page'] = request.session['current_page']
 	request.session['current_page'] = 'publish'
-	if carport_site_list.__len__() == 0:
-		publish_message = '此账号下无可发布车位'
-		return render(request, 'carport/publish.html', locals())
 	result_list = []
 	for carport_site in carport_site_list:
 		if models.Carport.objects.get(site = carport_site).current_car_license == '':
@@ -149,8 +148,7 @@ def publish(request):
 	if result_list.__len__() == 0:
 		publish_message = '此账号下无可发布车位'
 	result_list_size = result_list.__len__()
-	# if request.method!='POST':
-	# 	publish_form = models.PublishForm(result_list)
+	alert_class = 'alert-warning'
 	return render(request , 'carport/publish.html' , locals())
 
 
@@ -175,9 +173,12 @@ def inquiry(request):
 		elif diff == temp:
 			appointment_form.total = get_price(temp)
 
-		appointment_message = '查询、计价成功！'
+		request.session['appointment_message'] = '查询、计价成功！'
+		# appointment_message = '查询、计价成功！'
 		alert_class = 'alert-success'
 		carport_list = get_carport_list(begin_time, end_time)
+		negotiate_list = get_negotiate_list(begin_time, end_time)
+		request.session['negotiate_list'] = negotiate_list
 		request.session['appointment_car_license'] = car_license
 		request.session['appointment_begin_time'] = begin_time
 		request.session['appointment_end_time'] = end_time
@@ -189,23 +190,121 @@ def inquiry(request):
 """
 返回指定时间内的可协商车位的列表
 """
-# def negotiate(begin_time, end_time):
-# 	diff = date_diff(begin_time, end_time)
-# 	if diff <= 24:
-
+def get_negotiate_list(begin_time, end_time):
+	record_list = models.Record.objects.all()
+	record_map = {}
+	result = []
+	for i in record_list:#时间相加有问题
+		record_map.update({i.carport_site:record_map.get(i.carport_site, 0)+i.total_time})
+	sort_list = sorted(record_map.items(), key = lambda x: x[1], reverse = False)
+	diff = date_diff(begin_time, end_time)
+	print(sort_list)
+	for i in range(0 , 9):
+		try:
+			result.append((sort_list[i][0] , models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
+		except:
+			print(i)
+	return result
+	# if diff <= 24:
+	# 	for i in range(0,9):
+	# 		result.append((sort_list[i][0], models.Carport.objects.get(site = sort_list[i][0])))
+	# 	return result
+	# else:
 
 
 """
-初始化，显示我的订单页面
+执行协商
 """
-def order(request):
-	order_message = "x"
-	user_phone = request.session.get('user').id
-	order_list = models.Order.objects.filter(carport_owner_phone = user_phone)
+def negotiate(request):
+	negotiate_list = request.session['negotiate_list']
+	user = request.session['user']
+	models.Negotiation.objects.create(
+		customer_phone = user.phone,
+		owner_phone = negotiate_list[0][1],
+		negotiate_site = negotiate_list[0][0],
+		negotiate_list = negotiate_list,
+		record_time = datetime.datetime.now(),
+		status = 'underway',
+	)
+	return render(request , 'carport/appointment.html' ,locals())
+
+
+def auto_negotiate():
+	negotiations = models.Negotiation.objects.filter(status = 'underway')
+	for item in negotiations:
+		site = item.negotiate_site
+		create_time = item.record_time
+		now = datetime.datetime.now()
+		negotiate_list = eval(item.negotiate_list.replace("'", ""))
+		#如果已经是最后一个协商车位，则结束
+		if site == negotiate_list[negotiate_list.__len__()-1][0]:
+			item.status = 'end'
+			item.save()
+			continue
+		#如果当前时间-记录时间 > 3min ，选择下一个车位进行协商
+		if (now - create_time).seconds/60 > 1:
+			print((now - create_time).seconds/60)
+			for i in range(0, negotiate_list.__len__()-1):
+				if int(negotiate_list[i][0]) == int(site):
+					item.negotiate_site = negotiate_list[i+1][0]
+					item.save()
+					break
+
+
+"""
+初始化，显示我预订的订单页面
+"""
+def order_to(request):
+	order_message = ""
+	user_phone = request.session.get('user').phone
+	order_list = models.Order.objects.filter(carport_customer_id = user_phone)
+	k = 0
+	step_index = -1
+	try:
+		negotiation = models.Negotiation.objects.get(customer_phone = user_phone , status = 'underway')
+		negotiate_list = eval(negotiation.negotiate_list.replace("'", ""))
+		list_len = negotiate_list.__len__()
+		negotiate_site = negotiation.negotiate_site
+		for i in range(0, negotiate_list.__len__()):
+			print(list_len)
+			print(negotiate_list[i][2])
+			print(list_len == negotiate_list[i][2])
+			if int(negotiate_list[i][0]) == int(negotiate_site):
+				step_index = i
+				# break
+	except:
+		pass
 
 	request.session['previous_page'] = request.session['current_page']
-	request.session['current_page'] = 'order'
-	return render(request, 'carport/order.html', locals())
+	request.session['current_page'] = 'order_to'
+	return render(request, 'carport/order_to.html', locals())
+
+
+"""
+初始化，显示我接受的订单页面
+"""
+def order_from(request):
+	order_message = ""
+	user_phone = request.session.get('user').phone
+	order_list = models.Order.objects.filter(carport_owner_id = user_phone)
+
+	request.session['previous_page'] = request.session['current_page']
+	request.session['current_page'] = 'order_from'
+	return render(request, 'carport/order_from.html', locals())
+
+
+"""
+显示消息通知页面
+"""
+def inform(request):
+	user_phone = request.session['user'].phone
+	try:
+		negotiation_to = models.Negotiation.objects.get(customer_phone = user_phone)
+	except:
+		pass
+	request.session['previous_page'] = request.session['current_page']
+	request.session['current_page'] = 'inform'
+	return render(request , 'carport/order_from.html' , locals())
 
 
 """
@@ -220,7 +319,7 @@ def finish(request):
 	order_message = "x"
 	user_phone = request.session.get('user').phone
 	order_list = models.Order.objects.filter(carport_customer_phone = user_phone)
-	return render(request, 'carport/order.html', locals())
+	return render(request, 'carport/order_to.html', locals())
 
 
 """
@@ -254,7 +353,7 @@ def cancel(request):
 			order.save()
 			carport_customer.credit -= decimal.Decimal(0.50)
 			carport_customer.save()
-	return render(request , 'carport/order.html' , locals())
+	return render(request , 'carport/order_to.html' , locals())
 
 
 """
@@ -303,8 +402,6 @@ def check():
 			order.status = 'danger'
 			carport_customer.save()
 			order.save()
-			print(order)
-			print(carport_customer)
 
 
 
