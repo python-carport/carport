@@ -153,7 +153,11 @@
             }
 
             function negotiate() {
-                $.post('negotiate',{},function (data) {
+                var car_license = $('#id_car_license').val();
+                var begin_time = $('#id_begin_time').val();
+                var end_time = $('#id_end_time').val();
+                console.log($('#id_total').val())
+                $.post('negotiate',{car_license:car_license, begin_time:begin_time, end_time:end_time},function (data) {
 {#                    console.log(data)#}
                     $('#hint').html("系统协商中")
                 })

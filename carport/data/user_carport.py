@@ -31,7 +31,7 @@ models.Carport.objects.all().delete()
 models.Link.objects.all().delete()
 
 id = 0
-for i in range (2, rows):
+for i in range (1, rows):
     name = trim(sheet.cell (i,1).value)
     phone = trim(str(sheet.cell (i,2).value).split(".")[0])
     car_license = trim(sheet.cell (i,3).value)

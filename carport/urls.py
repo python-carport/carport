@@ -14,4 +14,5 @@ urlpatterns = [
     path('finish', views.finish, name = 'finish'),
     path('cancel', views.cancel, name = 'cancel'),
     path('negotiate', views.negotiate, name = 'negotiate'),
+    path('inform', views.inform, name = 'inform'),
 ]

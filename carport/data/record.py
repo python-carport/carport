@@ -47,11 +47,13 @@ for i in range(2, rows):
 	end_time = sheet.cell(i, 12).value
 
 	if type == '月租车':
-		a+=1
+
 		try:
-			site = models.Link.objects.get(car_license = car_license)
+			site = models.Link.objects.get(car_license = car_license).carport_site
 		except:
 			print(car_license)
+			a += 1
+			continue
 
 	models.Record.objects.create(
 		id = id,
@@ -62,7 +64,8 @@ for i in range(2, rows):
 		total_time = decimal.Decimal(str(total_time).split('小时')[0])+(decimal.Decimal(str(total_time).split('小时')[1].split('分')[0])/60),
 		begin_time = begin_time,
 		end_time = end_time,
-		carport_site = str(random.randint(1, 130)),
+		carport_site = site
+		# carport_site = str(random.randint(1, 130)),
 	)
 	# print(id)
 print(a)

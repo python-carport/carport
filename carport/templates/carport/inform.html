@@ -27,41 +27,30 @@
                     </div>
                     <div class="panel-body">
                         <table class="table">
-{#                          <thead>#}
-{#                            <tr>#}
-{#                              <th>订单号</th>#}
-{#                              <th>订单创建日期</th>#}
-{#                              <th>预约的车牌</th>#}
-{#                              <th>预约的车位</th>#}
-{#                              <th>开始时间</th>#}
-{#                              <th>结束时间</th>#}
-{#                              <th>订单金额</th>#}
-{#                              <th>订单状态</th>#}
-{#                              <th>操作</th>#}
-{#                            </tr>#}
-{#                          </thead>#}
-                          <tbody>
+                          <thead>
                             <tr>
-                                <td><strong>正在协商的用户电话</strong></td>
+                              <th width="60px">通知号</th>
+                              <th width="200px">创建日期</th>
+                              <th width="600px">信息</th>
+                              <th>状态</th>
+                              <th>操作</th>
                             </tr>
-{#                            {% for order in order_list %}#}
-{#                                <tr class="{{ order.status }}">#}
-{#                                    <td>{{ order.id }}</td>#}
-{#                                    <td>{{ order.create_time }}</td>#}
-{#                                    <td>{{ order.car_license }}</td>#}
-{#                                    <td>{{ order.carport }}</td>#}
-{#                                    <td>{{ order.begin_time }}</td>#}
-{#                                    <td>{{ order.end_time }}</td>#}
-{#                                    <td>{{ order.amount }}</td>#}
-{#                                    <td>{{ order|displayName:'status' }}</td>#}
-{#                                    {% if order.status == 'success' %}#}
-{#                                        <td>#}
-{#                                            <button onclick="cancel({{ order.id }})" type="button" class="btn btn-danger">取消</button>#}
+                          </thead>
+                          <tbody>
+                            {% for inform in inform_list %}
+                                <tr class="{{ order.status }}">
+                                    <td>{{ inform.id }}</td>
+                                    <td>{{ inform.create_time }}</td>
+                                    <td>{{ inform.message }}</td>
+                                    <td>{{ inform.status }}</td>
+                                    {% if order.status == 'success' %}
+                                        <td>
+                                            <button onclick="accept({{ inform.id }})" type="button" class="btn btn-success">接受</button>
 {#                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-warning">终止</button>#}
-{#                                        </td>#}
-{#                                    {% endif %}#}
-{#                                </tr>#}
-{#                            {% endfor %}#}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
                           </tbody>
                         </table>
                     </div>
@@ -96,8 +85,8 @@
 
 {% block js %}
     <script>
-        function finish(order_id) {
-            $.get('finish',{order_id:order_id},function (data) {
+        function accept(inform_id) {
+            $.get('accept',{inform_id:inform_id},function (data) {
                 console.log(data);
                 location.reload()
             })
@@ -106,33 +95,6 @@
             $.get ('cancel', {order_id:order_id},function (){
                 location.reload()
             })
-        }
-
-        var steps = $(".step");
-        var stepIndex = {{ step_index }};
-
-        setStep(stepIndex);
-
-        $(".step-icon").click(function () {
-            var me = this;
-            stepIndex = $(me).parents(".step").index();
-            setStep(stepIndex);
-        });
-
-
-        function setStep(stepIndex) {
-            $(steps).removeClass("is-success");
-            $(steps).removeClass("last-success");
-
-            for (var i = 0; i <= stepIndex; i++) {
-                var step = steps[i];
-                if (i < stepIndex) {
-                    $(step).addClass("is-success");
-                }
-                else {
-                    $(step).addClass("last-success");
-                }
-            }
         }
     </script>
 {% endblock %}

@@ -23,7 +23,6 @@ class Carport(models.Model):
 	site = models.CharField(primary_key = True, max_length = 200)
 	current_car_license = models.CharField(max_length = 200, default = '')
 	owner_phone = models.CharField(max_length = 200)
-	owner_phonex = models.CharField(max_length = 200)
 
 	def __str__(self):
 		if self.current_car_license != '':
@@ -57,13 +56,14 @@ class Record(models.Model):
 
 class Order(models.Model):
 	status_list = (
-		# ('1', '未开始'),
+		('negotiate', '协商中'),
+		('fail' , '协商失败') ,
 		('success', '进行中'),
 		('warning', '已结束'),
 		('active', '已撤销'),
 		('danger', '超时'),
 	)
-	id = models.IntegerField(primary_key = True, db_column = 'Fld')
+	id = models.AutoField(primary_key = True)
 	carport_owner = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
 	carport_customer = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
 	car_license = models.CharField(max_length = 200)
@@ -86,7 +86,7 @@ class Negotiation(models.Model):
 	negotiate_site = models.CharField(max_length = 200)
 	negotiate_list = models.CharField(max_length = 1000)
 	record_time = models.DateTimeField()
-	status = models.CharField(max_length = 20, default = 'underway')
+	status = models.CharField(max_length = 20, default = 'underway') #underway, end
 
 
 class AvailCarport(models.Model):
@@ -94,6 +94,16 @@ class AvailCarport(models.Model):
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 	owner_phone = models.CharField(max_length = 200)
+
+
+class Inform(models.Model):
+	id = models.IntegerField(primary_key = True , db_column = 'Fld')
+	belong_phone = models.CharField(max_length = 200)
+	message = models.CharField(max_length = 200)
+	create_time = models.DateTimeField()
+	status = models.CharField(max_length = 20) #underway , over_time, fail
+	order = models.ForeignKey(Order, related_name = '+', on_delete = models.CASCADE)
+	negotiate_id = models.CharField(max_length = 200)
 
 
 class LoginForm(forms.Form):
