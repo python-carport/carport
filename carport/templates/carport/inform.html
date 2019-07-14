@@ -7,13 +7,13 @@
     <div class="container">
         <div class="row">
             <div class="col-md-offset-1 col-md-10" style="height: 80px">
-                {% if inform_message != "" %}
-                    <div id="hint">
-                        <div class="alert alert-danger alert-dismissable">
+                {% if message != "" %}
+                    <div >
+                        <div class="alert {{ alert_class }} alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
                                 &times;
                             </button>
-                            {{ inform_message }}
+                            <div id="hint">{{ message }}</div>
                         </div>
                     </div>
                 {% endif %}
@@ -29,24 +29,24 @@
                         <table class="table">
                           <thead>
                             <tr>
-                              <th width="60px">通知号</th>
+                              <th width="80px">通知号</th>
                               <th width="200px">创建日期</th>
                               <th width="600px">信息</th>
-                              <th>状态</th>
-                              <th>操作</th>
+                              <th width="100px">状态</th>
+                              <th width="140px">操作</th>
                             </tr>
                           </thead>
                           <tbody>
                             {% for inform in inform_list %}
-                                <tr class="{{ order.status }}">
+                                <tr class="{{ inform.status }}">
                                     <td>{{ inform.id }}</td>
                                     <td>{{ inform.create_time }}</td>
                                     <td>{{ inform.message }}</td>
-                                    <td>{{ inform.status }}</td>
-                                    {% if order.status == 'success' %}
+                                    <td>{{ inform|displayName:'status'}}</td>
+                                    {% if inform.status == 'success' %}
                                         <td>
                                             <button onclick="accept({{ inform.id }})" type="button" class="btn btn-success">接受</button>
-{#                                            <button onclick="finish({{ order.id }})" type="button" class="btn btn-warning">终止</button>#}
+                                            <button onclick="reject({{ inform.id }})" type="button" class="btn btn-warning">拒绝</button>
                                         </td>
                                     {% endif %}
                                 </tr>
@@ -55,29 +55,6 @@
                         </table>
                     </div>
                 </div>
-                {% if step_index != -1 %}
-                    <div class="steps">
-                    <h3 style="float: left">协商进度：</h3>
-                    {% for i in negotiate_list %}
-                        <div class="step ">
-                            <div class="step-head">
-                                <div class="step-icon">
-                                    {{ i.2 }}
-                                </div>
-                                {% if i.2 != list_len %}
-
-                                    <div class="step-line"></div>
-                                {% endif %}
-                            </div>
-                            <div class="step-main">
-                                {{ i.0 }}号车位
-                            </div>
-                        </div>
-                    {% endfor %}
-                    </div>
-
-                {% endif %}
-
             </div>
         </div>
     </div>
@@ -86,13 +63,12 @@
 {% block js %}
     <script>
         function accept(inform_id) {
-            $.get('accept',{inform_id:inform_id},function (data) {
-                console.log(data);
+            $.post('accept',{inform_id:inform_id},function (data) {
                 location.reload()
             })
         }
-        function cancel(order_id){
-            $.get ('cancel', {order_id:order_id},function (){
+        function reject(inform_id){
+            $.post ('reject', {inform_id:inform_id},function (){
                 location.reload()
             })
         }

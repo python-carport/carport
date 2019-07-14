@@ -8,15 +8,15 @@
 
 {% block content %}
     <div class="container">
-        <div class="row">
+       <div class="row">
             <div class="col-md-offset-1 col-md-10" style="height: 80px">
-                {% if publish_message != "" %}
-                    <div id="hint">
+                {% if message != "" %}
+                    <div >
                         <div class="alert {{ alert_class }} alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
                                 &times;
                             </button>
-                            {{ publish_message }}
+                            <div id="hint">{{ message }}</div>
                         </div>
                     </div>
                 {% endif %}

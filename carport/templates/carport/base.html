@@ -8,14 +8,9 @@
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/scrollbar.css' %}" rel="stylesheet">
-{#<style type="text/css">#}
-{#		@font-face {#}
-{#			font-family: 'Glyphicons Halflings';#}
-{#			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot'%}");#}
-{#			src: url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.eot?#iefix'%}") format('embedded-opentype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.woff'%}") format('woff'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.ttf'%}") format('truetype'), url("{% static 'bootstrap-3.3.7-dist/fonts/glyphicons-halflings-regular.svg'%}") format('svg');#}
-{#		}#}
-{#</style>#}
-    {% block css %}{% endblock %}
+
+{% block css %}
+{% endblock %}
 </head>
 <body>
     {% if request.session.is_login %}
@@ -57,9 +52,9 @@
     <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js' %}"></script>
 
     <script>
-        {% if request.session.is_login and request.session.current_page != request.session.previous_page %}
+        {% if request.session.is_login %}
             $("#{{ request.session.current_page }}").addClass("active");
-            {% if request.session.previous_page != '' %}
+            {% if request.session.previous_page != '' and request.session.current_page != request.session.previous_page %}
                 $("#{{ request.session.previous_page }}").removeClass("active");
             {% endif %}
         {% endif %}

@@ -10,13 +10,13 @@
     <div class="container">
         <div class="row">
             <div class="col-md-offset-1 col-md-10" style="height: 80px">
-                {% if appointment_message != "" %}
+                {% if message != "" %}
                     <div >
                         <div class="alert {{ alert_class }} alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
                                 &times;
                             </button>
-                            <div id="hint">{{ request.session.appointment_message }}</div>
+                            <div id="hint">{{ message }}</div>
                         </div>
                     </div>
                 {% endif %}
@@ -144,11 +144,7 @@
 
             function appointment(carport_site) {
                 $.post('appointment', {carport_site: carport_site}, function (data) {
-                    console.log(window)
-                    console.log(data)
-
-{#                    console.log()#}
-{#                    location.reload()#}
+                    location.href = 'order_to'
                 })
             }
 
@@ -156,9 +152,7 @@
                 var car_license = $('#id_car_license').val();
                 var begin_time = $('#id_begin_time').val();
                 var end_time = $('#id_end_time').val();
-                console.log($('#id_total').val())
                 $.post('negotiate',{car_license:car_license, begin_time:begin_time, end_time:end_time},function (data) {
-{#                    console.log(data)#}
                     $('#hint').html("系统协商中")
                 })
             }

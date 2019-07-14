@@ -57,11 +57,11 @@ class Record(models.Model):
 class Order(models.Model):
 	status_list = (
 		('negotiate', '协商中'),
-		('fail' , '协商失败') ,
 		('success', '进行中'),
 		('warning', '已结束'),
 		('active', '已撤销'),
 		('danger', '超时'),
+		('invalid' , '无效订单') ,
 	)
 	id = models.AutoField(primary_key = True)
 	carport_owner = models.ForeignKey(User, related_name = '+', on_delete = models.CASCADE)
@@ -72,7 +72,7 @@ class Order(models.Model):
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 	amount = models.DecimalField(max_digits = 10, decimal_places = 2)
-	status = models.CharField(max_length = 10, choices = status_list, default = 1)
+	status = models.CharField(max_length = 10, choices = status_list)
 
 	def __str__(self):
 		return '%s 与 %s -- %s' % (self.carport_customer.name, self.carport_owner.name, self.create_time)
@@ -80,13 +80,14 @@ class Order(models.Model):
 
 #协商列表
 class Negotiation(models.Model):
-	id = models.IntegerField(primary_key = True , db_column = 'Fld')
+	id = models.AutoField(primary_key = True)
 	customer_phone = models.CharField(max_length = 200)
 	owner_phone = models.CharField(max_length = 200)
 	negotiate_site = models.CharField(max_length = 200)
 	negotiate_list = models.CharField(max_length = 1000)
 	record_time = models.DateTimeField()
-	status = models.CharField(max_length = 20, default = 'underway') #underway, end
+	# underway--进行中, end--结束
+	status = models.CharField(max_length = 20, default = 'underway')
 
 
 class AvailCarport(models.Model):
@@ -97,11 +98,17 @@ class AvailCarport(models.Model):
 
 
 class Inform(models.Model):
+	status_list = (
+		('success' , '进行中') ,
+		('warning' , '已接受') ,
+		('active' , '超时/已拒绝') ,
+		('danger' , '协商失败') ,
+	)
 	id = models.IntegerField(primary_key = True , db_column = 'Fld')
 	belong_phone = models.CharField(max_length = 200)
 	message = models.CharField(max_length = 200)
 	create_time = models.DateTimeField()
-	status = models.CharField(max_length = 20) #underway , over_time, fail
+	status = models.CharField(max_length = 10 , choices = status_list)
 	order = models.ForeignKey(Order, related_name = '+', on_delete = models.CASCADE)
 	negotiate_id = models.CharField(max_length = 200)
 
