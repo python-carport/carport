@@ -22,6 +22,19 @@ def trim(s):
 
     return s
 
+def date_diff(begin_time, end_time):
+	diff = end_time - begin_time
+	diff_str = str(diff)
+	if diff_str.find(' days, ') > 0:
+		d = int(diff_str.split(' days, ')[0])
+		h = diff.seconds/60/60
+		return d*24+h
+	elif diff_str.find(' day, ') > 0:
+		h = diff.seconds / 60 / 60
+		return 24 + h
+	else:
+		h = diff.seconds/60/60
+		return h
 
 from carport import models
 # from django.db import models
@@ -37,13 +50,15 @@ a=0
 models.Record.objects.all().delete()
 # 13
 #6430 出入车辆号码不一  入：津JC30L0  出：苏AC30L0
+
 for i in range(2, rows):
 	id = sheet.cell(i, 0).value
 	car_license = trim(sheet.cell(i, 1).value)
 	type = trim(sheet.cell(i, 3).value)
 	local = trim(sheet.cell(i, 5).value)
 	account = trim(sheet.cell(i, 7).value)
-	total_time = trim(sheet.cell(i, 8).value)
+	total_time = float(str(trim(sheet.cell(i, 8).value)).split('小时')[0]) + (
+					float(str(trim(sheet.cell(i, 8).value)).split('小时')[1].split('分')[0]) / 60)
 	begin_time = sheet.cell(i, 9).value
 	end_time = sheet.cell(i, 12).value
 
@@ -60,35 +75,59 @@ for i in range(2, rows):
 
 	if bt==et:
 		models.Record.objects.create(
-
-
 			car_license=car_license,
 			type=type,
 			local=local,
 			account=account,
-			total_time=decimal.Decimal(str(total_time).split('小时')[0]) + (
-					decimal.Decimal(str(total_time).split('小时')[1].split('分')[0]) / 60),
+			total_time=total_time,
 			begin_time=begin_time,
 			end_time=end_time,
 			carport_site=site,
 			weekday= bt.weekday(),
 			group= id,
-
-
 		)
 	else:
+		# 第一天
+		first_day_time = date_diff(datetime.datetime.strptime(begin_time, '%Y-%m-%d %H:%M:%S'), datetime.datetime.strptime(str(begin_time).split(' ')[0]+" 23:59:59",'%Y-%m-%d %H:%M:%S'))
+		models.Record.objects.create(
+			car_license = car_license ,
+			type = type ,
+			local = local ,
+			account = account ,
+			total_time = first_day_time,
+			begin_time = begin_time ,
+			end_time = datetime.datetime.strptime(str(begin_time).split(' ')[0]+" 23:59:59",'%Y-%m-%d %H:%M:%S') ,
+			carport_site = site ,
+			weekday = bt.weekday() ,
+			group = id , )
+		bt = bt + datetime.timedelta(days = 1)
+		total_time = total_time - first_day_time
+		# 中间天数
 		while bt < et:
 			models.Record.objects.create(
 				car_license=car_license,
 				type=type,
 				local=local,
 				account=account,
-				total_time=decimal.Decimal(str(total_time).split('小时')[0]) + (
-						decimal.Decimal(str(total_time).split('小时')[1].split('分')[0]) / 60),
-				begin_time=begin_time,
-				end_time=end_time,
+				total_time=24,
+				begin_time=datetime.datetime.strptime(str(bt).split(' ')[0] + " 00:00:00" , '%Y-%m-%d %H:%M:%S'),
+				end_time=datetime.datetime.strptime(str(bt).split(' ')[0]+" 23:59:59",'%Y-%m-%d %H:%M:%S'),
 				carport_site=site,
 				weekday=bt.weekday(),
 				group=id,)
 			bt=bt+datetime.timedelta(days = 1)
+			total_time -= 24
+		# 最后一天
+		models.Record.objects.create(
+			car_license = car_license ,
+			type = type ,
+			local = local ,
+			account = account ,
+			total_time = total_time ,
+			begin_time = datetime.datetime.strptime(str(bt).split(' ')[0] + " 00:00:00" , '%Y-%m-%d %H:%M:%S'),
+			end_time = end_time ,
+			carport_site = site ,
+			weekday = bt.weekday() ,
+			group = id , )
+	print(i)
 

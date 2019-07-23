@@ -48,7 +48,7 @@ class Record(models.Model):
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 	weekday = models.IntegerField()
-	groups = models.IntegerField()
+	group = models.IntegerField()
 	carport_site = models.CharField(max_length = 10)
 
 
