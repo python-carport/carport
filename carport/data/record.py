@@ -1,3 +1,4 @@
+import datetime
 import decimal
 import random
 
@@ -55,7 +56,19 @@ for i in range(2, rows):
 			a += 1
 			continue
 
+    bt=datetime.datetime.strptime(str(begin_time).split(' ')[0],'%Y-%m-%d')
+    et=datetime.datetime.strptime(str(end_time).split(' ')[0],'%Y-%m-%d')
+    while bt<=et:
+		models.Record.objects.create(
+
+		)
+
+
+
+		bt=bt+datetime.timedelta(days = 1)
+
 	models.Record.objects.create(
+
 		id = id,
 		car_license = car_license,
 		type = type,
@@ -64,7 +77,9 @@ for i in range(2, rows):
 		total_time = decimal.Decimal(str(total_time).split('小时')[0])+(decimal.Decimal(str(total_time).split('小时')[1].split('分')[0])/60),
 		begin_time = begin_time,
 		end_time = end_time,
-		carport_site = site
+		carport_site = site,
+
+
 		# carport_site = str(random.randint(1, 130)),
 	)
 	# print(id)

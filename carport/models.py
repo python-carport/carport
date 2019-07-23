@@ -39,7 +39,7 @@ class Link(models.Model):
 
 
 class Record(models.Model):
-	id = models.IntegerField(primary_key = True)
+	id = models.AutoField(primary_key = True)
 	car_license = models.CharField(max_length = 200)
 	type = models.CharField(max_length = 200)
 	local = models.CharField(max_length = 200)
@@ -47,8 +47,11 @@ class Record(models.Model):
 	total_time = models.DecimalField(max_digits = 10, decimal_places = 2)
 	begin_time = models.DateTimeField()
 	end_time = models.DateTimeField()
+	weekday = models.IntegerField()
+    groups = models.IntegerField()
+    carport_site = models.CharField(max_length = 10)
 
-	carport_site = models.CharField(max_length = 10)
+
 
 	def __str__(self):
 		return '%s , %s' % (self.id, self.car_license)
@@ -128,4 +131,7 @@ class AppointmentForm(forms.Form):
 		attrs = {'class': 'form-control'}))
 	end_time = forms.DateTimeField(widget = forms.TextInput(
 		attrs = {'class': 'form-control'}))
+
+
+
 
