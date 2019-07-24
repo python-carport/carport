@@ -194,18 +194,34 @@ def inquiry(request):
 返回指定时间内的可协商车位的列表
 """
 def get_negotiate_list(begin_time, end_time):
-	record_list = models.Record.objects.all()
 	record_map = {}
+	carport_list = models.Carport.objects.all()
+	for i in carport_list:
+		record_map.update({i.site:0})
+	# weekday= datetime.datetime.strptime(begin_time ,'%Y-%m-%d %H:%M:%S').weekday
+	weekday = begin_time.weekday()
+	record_list1 = list(models.Record.objects.filter(begin_time__gte=begin_time,begin_time__lte=end_time))
+	record_list2 = list(models.Record.objects.filter(begin_time__lte=begin_time,end_time__gte=begin_time))
+	record_list = record_list1.__add__(record_list2)
 	result = []
-	for i in record_list:#时间相加有问题
-		record_map.update({i.carport_site:record_map.get(i.carport_site, 0)+i.total_time})
+	print (record_list1)
+	print (record_list2)
+	for i in record_list:
+		record_map.update({i.carport_site:record_map.get(i.carport_site,0)+1})
 	sort_list = sorted(record_map.items(), key = lambda x: x[1], reverse = False)
-	diff = date_diff(begin_time, end_time)
-	for i in range(0 , 9):
-		try:
-			result.append((sort_list[i][0] , models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
-		except:
-			print(i)
+	if sort_list.__len__()>=15:
+		for i in range(0,15):
+			try:
+				result.append((sort_list[i][0],models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
+			except:
+				print(i)
+	else:
+		for i in range(0, len(sort_list)):
+			try:
+				result.append((sort_list[i][0],models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
+			except:
+				print(i)
+
 	return result
 
 
