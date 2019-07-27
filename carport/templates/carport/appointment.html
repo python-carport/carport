@@ -127,6 +127,7 @@
                 format : 'YYYY-MM-DD HH:mm',
                 minDate: new Date(),
                 sideBySide: true,
+                useCurrent: false,
             });
             $('#datetimepicker2').datetimepicker({
                 format : 'YYYY-MM-DD HH:mm',
@@ -136,12 +137,17 @@
                 sideBySide: true,
             });
             $("#datetimepicker1").on("dp.change", function (e) {
+                var max_date = new Date(e.date)
+                max_date.setHours(23)
+                max_date.setMinutes(59)
                 $('#datetimepicker2').data("DateTimePicker").minDate(e.date);
-                $('#datetimepicker2').data("DateTimePicker").maxDate(e.date);
+                $('#datetimepicker2').data("DateTimePicker").maxDate(max_date);
             });
-            {#$("#datetimepicker2").on("dp.change", function (e) {#}
-            {#    $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);#}
-
+{#            $("#datetimepicker2").on("dp.change", function (e) {#}
+{#                var max_date = new Date(e.date)#}
+{#                console.log(max_date.getHours())#}
+{#                $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);#}
+{#            });#}
 
             function appointment(carport_site) {
                 $.post('appointment', {carport_site: carport_site}, function (data) {

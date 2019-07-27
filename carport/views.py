@@ -338,6 +338,7 @@ def negotiate_next(negotiation):
 	if negotiate_list.__len__()-index>=5:
 		negotiation.begin_site = negotiate_list[index][0]
 		negotiation.last_site = negotiate_list[index+5][0]
+		negotiation.save()
 		for i in range (index,index+5):
 			o = models.Order.objects.create(
 				car_license = order.car_license,
@@ -352,7 +353,7 @@ def negotiate_next(negotiation):
 			)
 			models.Inform.objects.create(
 				belong_phone=negotiate_list[i][1],
-				message = order.carport_customer_id + ' 请求协商车位：' + negotiate_list[i][0] + "\t预约时间为：" + order.begin_time + " 至 " + order.end_time,
+				message = order.carport_customer_id + ' 请求协商车位：' + negotiate_list[i][0] + "\t预约时间为：" + str(order.begin_time) + " 至 " + str(order.end_time),
 				create_time = get_now(),
 				status = 'success',
 				order = o,
@@ -361,7 +362,7 @@ def negotiate_next(negotiation):
 	else:
 		negotiation.begin_site = negotiate_list[index][0]
 		negotiation.last_site = negotiate_list[negotiate_list.__len__()-1][0]
-
+		negotiation.save()
 		for i in range (index,negotiate_list.__len__()):
 			o = models.Order.objects.create(
 				car_license = order.car_license,
@@ -376,7 +377,7 @@ def negotiate_next(negotiation):
 			)
 			models.Inform.objects.create(
 				belong_phone=negotiate_list[i][1],
-				message = order.carport_customer_id + ' 请求协商车位：' + negotiate_list[i][0] + "\t预约时间为：" + order.begin_time + " 至 " + order.end_time,
+				message = order.carport_customer_id + ' 请求协商车位：' + negotiate_list[i][0] + "\t预约时间为：" + str(order.begin_time) + " 至 " + str(order.end_time),
 				create_time = get_now(),
 				status = 'success',
 				order = o,
