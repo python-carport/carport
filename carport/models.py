@@ -88,6 +88,7 @@ class Negotiation(models.Model):
 	id = models.AutoField(primary_key = True)
 	customer_phone = models.CharField(max_length = 200)
 	last_site = models.CharField(max_length = 200)
+	begin_site = models.CharField(max_length = 200)
 	negotiate_list = models.CharField(max_length = 1000)
 	record_time = models.DateTimeField()
 	# underway--进行中, end--结束
