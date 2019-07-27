@@ -72,6 +72,8 @@ for i in range(2, rows):
 			continue
 	bt=datetime.datetime.strptime(str(begin_time).split(' ')[0],'%Y-%m-%d')
 	et=datetime.datetime.strptime(str(end_time).split(' ')[0],'%Y-%m-%d')
+	bh=datetime.datetime.strptime(str(begin_time).split(' ')[1],'%H:%M:%S')
+	eh=datetime.datetime.strptime(str(end_time).split(' ')[1],'%H:%M:%S')
 
 	if bt==et:
 		models.Record.objects.create(
@@ -85,6 +87,8 @@ for i in range(2, rows):
 			carport_site=site,
 			weekday= bt.weekday(),
 			group= id,
+			begin_hours=bh,
+			end_hours=eh,
 		)
 	else:
 		# 第一天
@@ -99,7 +103,10 @@ for i in range(2, rows):
 			end_time = datetime.datetime.strptime(str(begin_time).split(' ')[0]+" 23:59:59",'%Y-%m-%d %H:%M:%S') ,
 			carport_site = site ,
 			weekday = bt.weekday() ,
-			group = id , )
+			group = id ,
+			begin_hours=bh,
+			end_hours=datetime.datetime.strptime("23:59:59",'%H:%M:%S'),
+		)
 		bt = bt + datetime.timedelta(days = 1)
 		total_time = total_time - first_day_time
 		# 中间天数
@@ -114,7 +121,10 @@ for i in range(2, rows):
 				end_time=datetime.datetime.strptime(str(bt).split(' ')[0]+" 23:59:59",'%Y-%m-%d %H:%M:%S'),
 				carport_site=site,
 				weekday=bt.weekday(),
-				group=id,)
+				group=id,
+				begin_hours=datetime.datetime.strptime("00:00:00",'%H:%M:%S'),
+			    end_hours = datetime.datetime.strptime("23:59:59",'%H:%M:%S'),
+			)
 			bt=bt+datetime.timedelta(days = 1)
 			total_time -= 24
 		# 最后一天
@@ -128,6 +138,9 @@ for i in range(2, rows):
 			end_time = end_time ,
 			carport_site = site ,
 			weekday = bt.weekday() ,
-			group = id , )
+			group = id ,
+			begin_hours=datetime.datetime.strptime("00:00:00",'%H:%M:%S'),
+			end_hours=eh,
+		)
 	print(i)
 

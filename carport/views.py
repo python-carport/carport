@@ -200,8 +200,11 @@ def get_negotiate_list(begin_time, end_time):
 		record_map.update({i.site:0})
 	# weekday= datetime.datetime.strptime(begin_time ,'%Y-%m-%d %H:%M:%S').weekday
 	weekday = begin_time.weekday()
-	record_list1 = list(models.Record.objects.filter(begin_time__gte=begin_time,begin_time__lte=end_time))
-	record_list2 = list(models.Record.objects.filter(begin_time__lte=begin_time,end_time__gte=begin_time))
+	begin_hours=datetime.datetime.strptime(str(begin_time).split(' ')[1],'%H:%M:%S')
+	end_hours=datetime.datetime.strptime(str(end_time).split(' ')[1],'%H:%M:%S')
+
+	record_list1 = list(models.Record.objects.filter(weekday=weekday,begin_hours__gte=begin_hours,begin_hours__lte=end_hours))
+	record_list2 = list(models.Record.objects.filter(weekday=weekday,begin_hours__lte=begin_hours,end_hours__gte=begin_hours))
 	record_list = record_list1.__add__(record_list2)
 	result = []
 	print (record_list1)
@@ -209,19 +212,20 @@ def get_negotiate_list(begin_time, end_time):
 	for i in record_list:
 		record_map.update({i.carport_site:record_map.get(i.carport_site,0)+1})
 	sort_list = sorted(record_map.items(), key = lambda x: x[1], reverse = False)
-	if sort_list.__len__()>=15:
-		for i in range(0,15):
-			try:
-				result.append((sort_list[i][0],models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
-			except:
-				print(i)
-	else:
-		for i in range(0, len(sort_list)):
-			try:
-				result.append((sort_list[i][0],models.Carport.objects.get(site = sort_list[i][0]).owner_phone, result.__len__()+1))
-			except:
-				print(i)
-
+	success_map = {}
+	for i in range(0,15):
+		try:
+			success_list = list(models.Order.objects.filter(carport_site=sort_list[i][0],status='warning'))
+			success_map.update({sort_list[i][0]:success_list.__len__()})
+		except:
+			continue
+	sort_list = sorted(success_map.items(), key = lambda x: x[1], reverse = True)
+	for i in range(0, len(sort_list)):
+		try:
+			result.append(
+				(sort_list[i][0], models.Carport.objects.get(site=sort_list[i][0]).owner_phone, result.__len__() + 1))
+		except:
+			print(i)
 	return result
 
 
@@ -237,7 +241,10 @@ def negotiate(request):
 	end_time = request.POST['end_time']
 	total = get_price(date_diff(datetime.datetime.strptime(begin_time, '%Y-%m-%d %H:%M'), datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M')))
 	try:
-		models.Order.objects.filter(carport_customer_id = user.phone, status = 'negotiate').delete()
+		order_list = models.Order.objects.filter(carport_customer_id = user.phone, status = 'negotiate')
+		for i in order_list:
+			i.status = 'invalid'
+			i.save()
 	except:
 		pass
 	try:
@@ -245,40 +252,43 @@ def negotiate(request):
 		try:
 			info = models.Inform.objects.filter(negotiate_id = n.id , status = 'success')
 			for i in info:
-				i.status = 'over_time'
+				i.status = 'active'
 				i.save()
 		except:
 			pass
 		n.delete()
 	except:
 		pass
-	o = models.Order.objects.create(
-		car_license = car_license,
-		create_time = get_now(),
-		begin_time = begin_time,
-		carport_site = negotiate_list[0][0],
-		end_time = end_time,
-		amount = total,
-		status = 'negotiate',
-		carport_customer_id = user.phone,
-		carport_owner_id = negotiate_list[0][1],
-	)
+
+
+
 	n = models.Negotiation.objects.create(
-		customer_phone = user.phone ,
-		owner_phone = negotiate_list[0][1] ,
-		negotiate_site = negotiate_list[0][0] ,
-		negotiate_list = negotiate_list ,
-		record_time = get_now() ,
-		status = 'underway' ,
+		customer_phone=user.phone,
+		last_site=negotiate_list[4][0],
+		negotiate_list=negotiate_list,
+		record_time=get_now(),
+		status='underway',
 	)
-	models.Inform.objects.create(
-		belong_phone = negotiate_list[0][1] ,
-		message = user.phone + ' 请求协商车位：' + negotiate_list[0][0] + "\t预约时间为：" + begin_time + " 至 " + end_time ,
-		create_time = get_now() ,
-		status = 'success' ,
-		order = o ,
-		negotiate_id = n.id,
-	)
+	for i in range(0,5):
+		o = models.Order.objects.create(
+			car_license=car_license,
+			create_time=get_now(),
+			begin_time=begin_time,
+			carport_site=negotiate_list[i][0],
+			end_time=end_time,
+			amount=total,
+			status='negotiate',
+			carport_customer_id=user.phone,
+			carport_owner_id=negotiate_list[i][1],
+		)
+		models.Inform.objects.create(
+			belong_phone=negotiate_list[i][1],
+			message=user.phone + ' 请求协商车位：' + negotiate_list[i][0] + "\t预约时间为：" + begin_time + " 至 " + end_time,
+			create_time=get_now(),
+			status='success',
+			order=o,
+			negotiate_id=n.id,
+		)
 	return render(request , 'carport/appointment.html' ,locals())
 
 
@@ -298,8 +308,27 @@ def auto_negotiate():
 协商下一车位
 """
 def negotiate_next(negotiation):
-	site = negotiation.negotiate_site
+	last_site = negotiation.last_site
 	negotiate_list = eval(negotiation.negotiate_list)
+	index = -1
+	for i in range(0,negotiate_list.__len__()):
+		if last_site == negotiate_list[i][0]:
+			index = i
+			break
+	if index == negotiate_list.__len__()-1:
+		negotiation.status = 'end'
+
+
+	index = index+1
+	if negotiate_list.__len__()-index>=5:
+
+
+
+
+
+
+
+
 	o = models.Order.objects.get(carport_customer_id = negotiation.customer_phone , status = 'negotiate')
 	# 如果已经是最后一个协商车位，则结束
 	if site == negotiate_list[negotiate_list.__len__() - 1][0]:
