@@ -398,16 +398,19 @@ def order_to(request):
 	user_phone = request.session.get('user').phone
 	order_list = models.Order.objects.filter(carport_customer_id = user_phone).exclude(status = 'negotiate').exclude(status = 'invalid')
 	k = 0
-	step_index = -1
+	step_begin = -1
+	step_end = -1
 	try:
 		negotiation = models.Negotiation.objects.get(customer_phone = user_phone , status = 'underway')
-		negotiate_list = eval(negotiation.negotiate_list)
+		negotiate_list = list(eval(negotiation.negotiate_list))
 		list_len = negotiate_list.__len__()
-		negotiate_site = negotiation.negotiate_site
+		negotiate_begin = negotiation.begin_site
+		negotiate_end = negotiation.last_site
 		for i in range(0 , negotiate_list.__len__()):
-			if negotiate_list[i][0] == negotiate_site:
-				step_index = i
-				break
+			if negotiate_list[i][0] == negotiate_begin:
+				step_begin = i
+			if negotiate_list[i][0] == negotiate_end:
+				step_end = i
 	except:
 		pass
 

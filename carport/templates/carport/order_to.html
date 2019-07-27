@@ -107,10 +107,10 @@
             })
         }
 
-        var steps = $(".step"); #class 用 .
-        var stepIndex = {{ step_index }};
-
-        setStep(stepIndex);
+        var steps = $(".step");
+        var step_begin = {{ step_begin }};
+        var step_end = {{ step_end }};
+        setStep(step_begin, step_end);
 
         $(".step-icon").click(function () {
             var me = this;
@@ -119,18 +119,19 @@
         });
 
 
-        function setStep(stepIndex) {
+        function setStep(step_begin,step_end) {
             $(steps).removeClass("is-success");
-            $(steps).removeClass("last-success");
+{#            $(steps).removeClass("last-success");#}
 
-            for (var i = 0; i <= stepIndex; i++) {
-                var step = steps[i];
-                if (i < stepIndex) {
-                    $(step).addClass("is-success");
-                }
-                else {
-                    $(step).addClass("last-success");
-                }
+            for (var i = step_begin; i <= step_end; i++) {
+                $(steps[i]).addClass("is-success");
+{#                var step = steps[i];#}
+{#                if (i < stepIndex) {#}
+{#                    $(step).addClass("is-success");#}
+{#                }#}
+{#                else {#}
+{#                    $(step).addClass("last-success");#}
+{#                }#}
             }
         }
     </script>
