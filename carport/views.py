@@ -301,7 +301,7 @@ def auto_negotiate():
 		now = get_now()
 		create_time = item.record_time
 		# 如果当前时间-记录时间 > 1min ，选择下一个车位进行协商
-		if (now - create_time).seconds / 60 > 1:
+		if (now - create_time).seconds / 60 > 10:
 			negotiate_next(item)
 
 """
